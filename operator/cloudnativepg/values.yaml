@@ -1,0 +1,10 @@
+cloudnativepg:
+  name: cluster-postgresql
+  usercluster: keycloak
+  userpassword: "Qh3HOfNu7l8ziTL"
+  UpdateStrategy: supervised
+  postgrespassword: "Qh3HOJfNu7l8ziTL"
+  size: 20Gi
+  database: keycloak
+  databaseOwner: keycloak
+  enableSuperuserAccess: true #the true parameter and not recommended
