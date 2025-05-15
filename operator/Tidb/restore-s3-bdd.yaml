@@ -1,0 +1,19 @@
+---
+apiVersion: pingcap.com/v1alpha1
+kind: Restore
+metadata:
+  name: restore-bdd-commonlight
+spec:
+  backupType: full
+  to:
+    host: {{ .Values.tidb.host }}
+    port: {{ .Values.tidb.tidb.port }}
+    user: {{ .Values.tidb.usercluster }}
+    secretName: tidb-secret
+  s3:
+    provider: aws
+    endpoint: {{ .Values.s3.endpoint }}
+    secretName: s3-secret
+    path: s3://{{ .Values.s3.bucket }}/{{ .Values.s3.dumpFile }}
+  # storageClassName: local-storage
+  storageSize: 1Gi
