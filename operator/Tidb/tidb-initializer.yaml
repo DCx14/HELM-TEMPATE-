@@ -1,0 +1,18 @@
+---
+apiVersion: pingcap.com/v1alpha1
+kind: TidbInitializer
+metadata:
+  name: {{ .Values.tidb.releasename }}
+spec:
+  ttlSecondsAfterFinished: 5
+  image: tnir/mysqlclient
+  # imagePullPolicy: IfNotPresent
+  cluster:
+    name: {{ .Values.tidb.releasename }}
+  initSql: |-
+    create database {{ .Values.tidb.database }};
+    GRANT ALL PRIVILEGES ON {{ .Values.tidb.database }}.* TO '{{ .Values.tidb.usercluster}}'@'%';
+    RESTORE DATABASE * FROM 's3://cloudservices-bdd/bck/?access-key={{ .Values.s3.access_key }}&secret-access-key={{ .Values.s3.secret_key }}&endpoint={{ .Values.sql.endpoint }}'
+  # initSqlConfigMap: tidb-initsql
+  passwordSecret: tidb-secret
+  # permitHost: 172.6.5.8
