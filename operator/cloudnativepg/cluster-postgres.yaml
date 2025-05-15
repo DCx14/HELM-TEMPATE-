@@ -1,1 +1,44 @@
+apiVersion: v1
+data:
+  password: {{ .Values.cloudnativepg.userpassword | b64enc }}
+  username: {{ .Values.cloudnativepg.usercluster | b64enc }}
+kind: Secret
+metadata:
+  name: cluster-app-user
+type: kubernetes.io/basic-auth
+---
+apiVersion: v1
+data:
+  password: {{ .Values.cloudnativepg.postgrespassword | b64enc }}
+  username: cG9zdGdyZXM=
+kind: Secret
+metadata:
+  name: cluster-user-postgres
+type: kubernetes.io/basic-auth
+---
 
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: {{ .Values.cloudnativepg.name}}
+spec:
+  livenessProbeTimeout: 300
+  description: "cluster-postgresql"
+  imageName: ghcr.io/cloudnative-pg/postgresql:15.4
+  instances: 3
+  primaryUpdateStrategy: {{ .Values.cloudnativepg.UpdateStrategy}}
+
+  bootstrap:
+    initdb:
+      database: {{ .Values.cloudnativepg.database}}
+      owner: {{ .Values.cloudnativepg.databaseOwner}}
+      secret:
+        name: cluster-app-user
+  enableSuperuserAccess: {{ .Values.cloudnativepg.enableSuperuserAccess}}
+  superuserSecret:
+    name: cluster-user-postgres
+
+  storage:
+    size: {{ .Values.cloudnativepg.size}}
+  monitoring:
+    enablePodMonitor: {{ .Values.cloudnativepg.enablePodMonitor}}
