@@ -1,0 +1,6 @@
+mysql:
+  name: cl-sql
+  instance: 3
+  routerinstance: 2
+  passwordroot: zHeye
+  storage: 12Gi
