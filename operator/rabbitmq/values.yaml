@@ -1,0 +1,7 @@
+
+rabbitmq:
+  username: "pppMQ"
+  password: "in-variable"
+  auth:
+    username: "pppMQ"
+    password: "in-variable"
