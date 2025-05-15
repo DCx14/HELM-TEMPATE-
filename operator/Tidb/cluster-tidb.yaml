@@ -1,0 +1,85 @@
+apiVersion: v1
+data:
+  {{ .Values.tidb.usercluster}}: {{ .Values.tidb.userpassword | b64enc }}
+  root: {{ .Values.tidb.rootpassword  | b64enc }}
+kind: Secret
+metadata:
+  name: tidb-secret
+type: Opaque
+---
+
+apiVersion: pingcap.com/v1alpha1
+kind: TidbCluster
+metadata:
+  name: {{ .Values.tidb.releasename }}
+spec:
+  configUpdateStrategy: RollingUpdate
+  enableDynamicConfiguration: true
+  enablePVReclaim: false
+  imagePullPolicy: IfNotPresent
+  helper:
+    image: alpine:3.16.0
+  pd:
+    baseImage: pingcap/pd
+    config: {}
+    imagePullPolicy: IfNotPresent
+    maxFailoverCount: 0
+    replicas: {{ .Values.tidb.pd.replicas }}
+    requests:
+      storage: {{ .Values.tidb.pd.storage }}
+  pvReclaimPolicy: Retain
+  schedulerName: default-scheduler
+  services:
+  - name: pd
+    type: {{ .Values.tidb.pd.services }}
+  tidb:
+#    initializer: 
+#      passwordSecret: "tidb-secret"
+#      initSql: "create database hello;"
+    baseImage: pingcap/tidb
+    config: {}
+    imagePullPolicy: IfNotPresent
+    maxFailoverCount: 0
+    replicas: 2
+    separateSlowLog: true
+    service:
+      port: {{ .Values.tidb.tidb.port }}
+      targetPort: 4000
+      type: {{ .Values.tidb.tidb.services }}
+    slowLogTailer:
+      image: alpine:3.16.0
+      imagePullPolicy: IfNotPresent
+      limits:
+        cpu: 1000m
+        memory: 500Mi
+      requests:
+        cpu: 20m
+        memory: 5Mi
+  tiflash:
+    baseImage: pingcap/tiflash
+    maxFailoverCount: 0
+    replicas: {{ .Values.tidb.tiflash.replicas }}
+    storageClaims:
+    - resources:
+        requests:
+          storage:  {{ .Values.tidb.tiflash.storage }}
+  tikv:
+    baseImage: pingcap/tikv
+    config: {}
+    imagePullPolicy: IfNotPresent
+    maxFailoverCount: 0
+    replicas:  {{ .Values.tidb.tikv.replicas }}
+    requests:
+      storage: {{ .Values.tidb.tikv.storage }}
+    config:
+      storage:
+        # In basic examples, we set this to avoid using too much storage.
+        reserve-space: "0MB"
+      rocksdb:
+        # In basic examples, we set this to avoid the following error in some Kubernetes clusters:
+        # "the maximum number of open file descriptors is too small, got 1024, expect greater or equal to 82920"
+        max-open-files: 256
+      raftdb:
+        max-open-files: 256
+  timezone: UTC
+  #version: v8.1.0
