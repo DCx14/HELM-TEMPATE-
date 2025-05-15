@@ -1,0 +1,20 @@
+{{- if .Values.sql.importsql }}
+---
+apiVersion: pingcap.com/v1alpha1
+kind: Restore
+metadata:
+  name: restore-portail
+spec:
+  backupType: full
+  br:
+    cluster: tidb-bdd
+  s3:
+    provider: {{ .Values.sql.provider }}
+    endpoint: {{ .Values.sql.endpoint }}
+    secretName: s3-secret
+    bucket: cloudservices-bdd
+    prefix: bck
+  storageSize: 1Gi
+  toolImage: pingcap/br:v7.1.1
+  backoffLimit: 20
+{{- end }}
