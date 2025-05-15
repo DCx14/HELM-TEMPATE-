@@ -1,3 +1,7 @@
+s3:
+  access_key: 6GVJefefefefefefefeHOC0O8V7I
+  secret_key: DTOfefefefefeF2PQ0ZHqr
+
 tidb:
   usercluster: toto
   userpassword: zHgfhfghgfh
