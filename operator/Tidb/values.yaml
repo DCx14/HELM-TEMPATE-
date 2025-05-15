@@ -1,0 +1,20 @@
+tidb:
+  usercluster: toto
+  userpassword: zHgfhfghgfh
+  rootpassword: zHfgnfgeye
+  releasename: tidb-bdd
+  database: app
+  pd:
+    storage: 1Gi
+    replicas: 1
+    services: ClusterIP
+  tidb:
+    replicas: 1
+    services: ClusterIP
+    port: 3306
+  tiflash:
+    replicas: 0
+    storage: 2Gi
+  tikv:
+    replicas: 1
+    storage: 2Gi
